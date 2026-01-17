@@ -8,7 +8,7 @@ namespace ImageLoad
     {
         public static List<SpriteData> LoadAllImages()
         {
-            var sprites = Resources.LoadAll<Sprite>("Sprites");
+            var sprites = Resources.LoadAll<Sprite>("CardSprites");
             var result = new List<SpriteData>(sprites.Length);
 
             foreach (var sprite in sprites)

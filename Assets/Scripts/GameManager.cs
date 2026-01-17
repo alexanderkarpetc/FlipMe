@@ -5,6 +5,7 @@ using Helpers;
 using ImageLoad;
 using UnityEngine;
 using UnityEngine.UI;
+using Views;
 
 public class GameManager : MonoBehaviour
 {
