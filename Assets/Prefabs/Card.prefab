@@ -50,6 +50,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2381268dc4af591428041ad6acd69872, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _image: {fileID: 8065422818561450086}
+  _backSprite: {fileID: 21300000, guid: 2bf5e9cd5c1600646be2c6e216a03dde, type: 3}
+  _rect: {fileID: 8065422818561450089}
+  _flipDuration: 0.3
+  _ignoreClicksWhileAnimating: 1
 --- !u!1 &8065422818561450088
 GameObject:
   m_ObjectHideFlags: 0
@@ -62,7 +67,7 @@ GameObject:
   - component: {fileID: 8065422818561450087}
   - component: {fileID: 8065422818561450086}
   m_Layer: 5
-  m_Name: Background
+  m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
