@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Data;
+using Helpers;
+using ImageLoad;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +15,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform _topHud;
 
     private readonly List<CardView> _spawned = new();
+    private List<SpriteData> _imageData;
+
+    private void Start()
+    {
+        _imageData = ImageLoader.LoadAllImages();
+    }
 
     public void StartGame(GameFieldSize fieldSize)
     {
@@ -23,16 +32,19 @@ public class GameManager : MonoBehaviour
         var (columns, rows) = GetGridSize(fieldSize);
         ApplyGridLayout(columns, rows);
 
-        SpawnCards(columns * rows);
-    }
-
-    public void LoadGame()
-    {
-        Debug.Log("Load Game");
+        var count = columns * rows;
+        SpawnCards(count);
     }
 
     private void SpawnCards(int count)
     {
+        var pairsNeeded = count / 2;
+
+        if (_imageData == null || _imageData.Count < pairsNeeded)
+            throw new InvalidOperationException($"Not enough sprites for pairs. Need={pairsNeeded}, Have={_imageData?.Count ?? 0}");
+
+        var deck = CardDeckBuilder.BuildShuffledDeck(pairsNeeded, _imageData);
+
         var parent = _gridLayoutGroup.transform;
 
         for (var i = 0; i < count; i++)
@@ -40,7 +52,7 @@ public class GameManager : MonoBehaviour
             var card = Instantiate(_cardPrefab, parent);
             _spawned.Add(card);
 
-            // card.Init();
+            card.Init(deck[i]);
         }
     }
 
@@ -72,9 +84,9 @@ public class GameManager : MonoBehaviour
     private static (int columns, int rows) GetGridSize(GameFieldSize size) =>
         size switch
         {
-            GameFieldSize.Size2x3 => (2, 3),
+            GameFieldSize.Size2x3 => (3, 2),
             GameFieldSize.Size4x4 => (4, 4),
-            GameFieldSize.Size4x6 => (4, 6),
+            GameFieldSize.Size4x6 => (6, 4),
             GameFieldSize.Size6x6 => (6, 6),
             _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
         };
@@ -91,12 +103,13 @@ public class GameManager : MonoBehaviour
     {
         for (var i = 0; i < _spawned.Count; i++)
         {
-            if (_spawned[i] != null)
-            {
-                Destroy(_spawned[i].gameObject);
-            }
+            if (_spawned[i] != null) Destroy(_spawned[i].gameObject);
         }
-
         _spawned.Clear();
+    }
+
+    public void LoadGame()
+    {
+        throw new NotImplementedException();
     }
 }
