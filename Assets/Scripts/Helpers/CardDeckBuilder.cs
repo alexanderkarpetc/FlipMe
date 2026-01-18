@@ -28,5 +28,17 @@ namespace Helpers
 
             return deck;
         }
+
+        public static List<CardData> GetDeckFromLoaded(List<CardData> imageData, GameSaveData cachedSave)
+        {
+            var deck = new List<CardData>(cachedSave.Cards.Count);
+            foreach (var cardSaveData in cachedSave.Cards)
+            {
+                var cardData = imageData.Find(data => data.Id == cardSaveData.CardId);
+                deck.Add(cardData);
+            }
+
+            return deck;
+        }
     }
 }
