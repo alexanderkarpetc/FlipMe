@@ -61,4 +61,20 @@ public class SaveManager
         PlayerPrefs.SetString(GameStateKey, JsonUtility.ToJson(saveData));
         PlayerPrefs.Save();
     }
+
+    public void UpdateScore(int score, bool wasSuccessfulMatch)
+    {
+        var saveData = TryLoad();
+        if (saveData == null)
+        {
+            Debug.LogError("Cannot update score, no save data found.");
+            return;
+        }
+
+        saveData.Score = score;
+        saveData.WasSuccessfulMatch = wasSuccessfulMatch;
+
+        PlayerPrefs.SetString(GameStateKey, JsonUtility.ToJson(saveData));
+        PlayerPrefs.Save();
+    }
 }

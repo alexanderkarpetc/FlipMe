@@ -9,5 +9,7 @@ namespace Data
         public int Columns;
         public int Rows;
         public List<CardSaveData> Cards = new List<CardSaveData>();
+        public int Score;
+        public bool WasSuccessfulMatch;
     }
 }

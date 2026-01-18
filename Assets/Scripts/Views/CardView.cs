@@ -59,6 +59,7 @@ namespace Views
 
         public void Complete()
         {
+            IsRevealed = true;
             _image.gameObject.SetActive(false);
         }
 
