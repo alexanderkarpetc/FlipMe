@@ -6,15 +6,15 @@ namespace ImageLoad
 {
     public static class ImageLoader
     {
-        public static List<SpriteData> LoadAllImages()
+        public static List<CardData> LoadAllImages()
         {
             var sprites = Resources.LoadAll<Sprite>("CardSprites");
-            var result = new List<SpriteData>(sprites.Length);
+            var result = new List<CardData>(sprites.Length);
 
             foreach (var sprite in sprites)
             {
                 if (sprite == null) continue;
-                result.Add(new SpriteData(sprite.name, sprite));
+                result.Add(new CardData(sprite.name, sprite));
             }
 
             return result;

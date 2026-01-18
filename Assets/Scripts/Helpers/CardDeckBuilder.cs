@@ -5,13 +5,13 @@ namespace Helpers
 {
     public static class CardDeckBuilder
     {
-        public static List<SpriteData> BuildShuffledDeck(int pairsNeeded, List<SpriteData> pool)
+        public static List<CardData> BuildShuffledDeck(int pairsNeeded, List<CardData> pool)
         {
             var chosen = new HashSet<int>();
             while (chosen.Count < pairsNeeded)
                 chosen.Add(UnityEngine.Random.Range(0, pool.Count));
 
-            var deck = new List<SpriteData>(pairsNeeded * 2);
+            var deck = new List<CardData>(pairsNeeded * 2);
 
             foreach (var idx in chosen)
             {

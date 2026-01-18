@@ -9,7 +9,7 @@ namespace Views
 {
     public class CardView : MonoBehaviour, IPointerClickHandler
     {
-        public event Action<SpriteData> OnClicked;
+        public event Action<CardView> OnClicked;
 
         [Header("UI")]
         [SerializeField] private Image _image;
@@ -19,25 +19,47 @@ namespace Views
         [SerializeField] private RectTransform _rect;
         [SerializeField] private float _flipDuration = 0.3f;
 
-        public bool IsRevealed { get; private set; }
-
-        private bool IsAnimating => _flipRoutine != null;
-
-        private SpriteData _data;
+        
+        private CardData _data;
         private Coroutine _flipRoutine;
 
-        public void Init(SpriteData spriteData)
+        public bool IsRevealed { get; private set; }
+        public bool IsAnimating => _flipRoutine != null;
+        public bool IsLocked { get; private set; }
+        public float FlipDuration => _flipDuration;
+        public CardData Data => _data;
+
+        public void Init(CardData cardData)
         {
-            _data = spriteData;
+            _data = cardData;
+
+            if (_rect == null) _rect = (RectTransform)transform;
+            IsLocked = false;
+            IsRevealed = false;
+            _image.sprite = _backSprite;
+            _rect.localScale = Vector3.one;
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (IsRevealed) return;
-            if (IsAnimating) return;
+            if (IsLocked || IsRevealed || IsAnimating) return;
 
             Reveal();
-            OnClicked?.Invoke(_data);
+            OnClicked?.Invoke(this);
+        }
+
+        public void Hide()
+        {
+            StopAllCoroutines();
+            IsRevealed = false;
+            StartFlip(toFront: false);
+        }
+
+        public void SetIsLocked(bool value) => IsLocked = value;
+
+        public void Complete()
+        {
+            _image.gameObject.SetActive(false);
         }
 
         private void Reveal()
@@ -69,7 +91,6 @@ namespace Views
 
             yield return ScaleX(1f, 0f, half);
 
-            // swap sprite
             _image.sprite = toFront ? _data.Sprite : _backSprite;
 
             yield return ScaleX(0f, 1f, half);

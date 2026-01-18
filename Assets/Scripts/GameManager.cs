@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Data;
 using Helpers;
@@ -16,7 +17,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform _topHud;
 
     private readonly List<CardView> _spawned = new();
-    private List<SpriteData> _imageData;
+    private List<CardData> _imageData;
+    private CardView _firstCard;
 
     private void Start()
     {
@@ -37,6 +39,18 @@ public class GameManager : MonoBehaviour
         SpawnCards(count);
     }
 
+    public void ToMainMenu()
+    {
+        _playField.gameObject.SetActive(false);
+        _mainMenu.gameObject.SetActive(true);
+        _topHud.gameObject.SetActive(false);
+        CleanupField();
+    }
+    public void LoadGame()
+    {
+        throw new NotImplementedException();
+    }
+
     private void SpawnCards(int count)
     {
         var pairsNeeded = count / 2;
@@ -52,8 +66,48 @@ public class GameManager : MonoBehaviour
         {
             var card = Instantiate(_cardPrefab, parent);
             _spawned.Add(card);
+            card.OnClicked += OnCardClicked;
 
             card.Init(deck[i]);
+        }
+    }
+
+    private void OnCardClicked(CardView view)
+    {
+        if (_firstCard == null)
+        {
+            _firstCard = view;
+            return;
+        }
+        StartCoroutine(CheckCardsMatchRoutine(view));
+    }
+
+    private IEnumerator CheckCardsMatchRoutine(CardView view)
+    {
+        SetCardLock(true);
+
+        yield return new WaitForSeconds(_cardPrefab.FlipDuration);
+
+        if (_firstCard?.Data.Id == view.Data.Id)
+        {
+            _firstCard.Complete();
+            view.Complete();
+        }
+        else
+        {
+            _firstCard.Hide();
+            view.Hide();
+        }
+
+        SetCardLock(false);
+        _firstCard = null;
+    }
+
+    private void SetCardLock(bool value)
+    {
+        foreach (var spawned in _spawned)
+        {
+            spawned.SetIsLocked(value);
         }
     }
 
@@ -64,18 +118,12 @@ public class GameManager : MonoBehaviour
         var padding = _gridLayoutGroup.padding;
         var spacing = _gridLayoutGroup.spacing;
 
-        float availableWidth =
-            rect.width
-            - padding.left - padding.right
-            - spacing.x * (columns - 1);
+        var availableWidth = rect.width - padding.left - padding.right - spacing.x * (columns - 1);
 
-        float availableHeight =
-            rect.height
-            - padding.top - padding.bottom
-            - spacing.y * (rows - 1);
+        var availableHeight = rect.height - padding.top - padding.bottom - spacing.y * (rows - 1);
 
-        float cellWidth = availableWidth / columns;
-        float cellHeight = availableHeight / rows;
+        var cellWidth = availableWidth / columns;
+        var cellHeight = availableHeight / rows;
 
         _gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         _gridLayoutGroup.constraintCount = columns;
@@ -92,25 +140,16 @@ public class GameManager : MonoBehaviour
             _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
         };
 
-    public void ToMainMenu()
-    {
-        _playField.gameObject.SetActive(false);
-        _mainMenu.gameObject.SetActive(true);
-        _topHud.gameObject.SetActive(false);
-        CleanupField();
-    }
-
     private void CleanupField()
     {
         for (var i = 0; i < _spawned.Count; i++)
         {
-            if (_spawned[i] != null) Destroy(_spawned[i].gameObject);
+            if (_spawned[i] != null)
+            {
+                _spawned[i].OnClicked -= OnCardClicked;
+                Destroy(_spawned[i].gameObject);
+            }
         }
         _spawned.Clear();
-    }
-
-    public void LoadGame()
-    {
-        throw new NotImplementedException();
     }
 }
