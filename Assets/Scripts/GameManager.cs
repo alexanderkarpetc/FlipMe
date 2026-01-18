@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform _mainMenu;
     [SerializeField] private Transform _playField;
     [SerializeField] private Transform _topHud;
+    [SerializeField] private AudioManager _audioManager;
 
     private readonly List<CardView> _spawned = new();
     private List<CardData> _imageData;
@@ -74,6 +75,7 @@ public class GameManager : MonoBehaviour
 
     private void OnCardClicked(CardView view)
     {
+        _audioManager.PlayFlipSound();
         if (_firstCard == null)
         {
             _firstCard = view;
@@ -92,11 +94,13 @@ public class GameManager : MonoBehaviour
         {
             _firstCard.Complete();
             view.Complete();
+            _audioManager.PlayMatchSound();
         }
         else
         {
             _firstCard.Hide();
             view.Hide();
+            _audioManager.PlayUnMatchSound();
         }
 
         SetCardLock(false);
