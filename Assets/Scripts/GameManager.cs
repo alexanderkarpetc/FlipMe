@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
         var deck = CardDeckBuilder.BuildShuffledDeck(pairsNeeded, _imageData);
         SpawnCards(deck);
         _score = Constants.StartingScore;
+        _wasSuccessfulMatch = false;
         _scoreText.text = $"Score: {_score}";
         _saveManager.SaveInitialState(columns, rows, deck);
     }
